@@ -1,6 +1,27 @@
 require 'colorize'
-ver = "0.1"
-input_array = ARGV
+
+def main()
+  input_array = ARGV
+  ver = "0.1"
+  if input_array.length <= 0
+    showHelp()
+  end
+
+  for i in input_array
+    if i == "--version"
+      puts "\nMD Convert Version #{ver}".colorize(:color => :blue, :mode => :bold)
+      puts ""
+      break
+    elsif i == "--help" || i == "-h"
+      showHelp()
+    elsif i[0] == "-"
+      puts "Invalid argument: #{i}".colorize(:color => :red, :mode => :bold)
+      break
+    else
+      getFile(i)
+    end
+  end
+end
 
 def showHelp()
   puts "\nMD Convert".colorize(:blue) + "\n\nGeneral"
@@ -28,26 +49,56 @@ def getFile(path)
   end
   begin
     data = File.read(path)
+    analyse(data)
   rescue StandardError => e
-    puts "Error".colorize(:background => :red) + ": Can't read the file : #{e}".colorize(:red)
+    puts "Error".colorize(:background => :red) + ": Conversion error : #{e}".colorize(:red)
+    return
   end
 end
 
-if input_array.length <= 0
-  showHelp()
+def analyse(data)
+  cutData = data.split("\n")
+  titleData = []
+  lastLineTitle = ""
+
+  cutData.each do |line|
+    titleData << titleAnalyse(line, lastLineTitle)
+    lastLineTitle = line
+  end
+
+  puts "[1/2] Title standard done...".colorize(:green)
+
+  title2Data = []
+  n = 0
+  while n < titleData.length
+    current = titleData[n]
+    next_one = titleData[n+1]
+
+    if next_one && next_one.match?(/\A-+\z/)
+      title2Data << "<h2>#{current}</h2>"
+      n += 2
+    elsif next_one && next_one.match?(/\A=+\z/)
+      title2Data << "<h1>#{current}</h1>"
+      n += 2
+    else
+      title2Data << current
+      n += 1
+    end
+  end
+
+  puts title2Data.join("\n")
+  puts "[2/2] Title alternate done...".colorize(:green)
 end
 
-for i in input_array
-  if i == "--version"
-    puts "\nMD Convert Version #{ver}".colorize(:color => :blue, :mode => :bold)
-    puts ""
-    break
-  elsif i == "--help" || i == "-h"
-    showHelp()
-  elsif i[0] == "-"
-    puts "Invalid argument: #{i}".colorize(:color => :red, :mode => :bold)
-    break
-  else
-    getFile(i)
+def titleAnalyse(line,lastLine)
+  if line.match?(/\A\#{1,6}\s+/)
+    level = line[/\A(\#{1,6})\s+/, 1]&.length
+    line = line.sub(/\A\#{1,6}\s+/, "")
+    return "<h" + level.to_s + ">" + line + "</h" + level.to_s + ">"
   end
+  return line
 end
+
+
+
+main()
