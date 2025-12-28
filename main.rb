@@ -1,4 +1,6 @@
 require 'colorize'
+require 'rbconfig'
+require_relative 'emoji'
 
 def main()
   input_array = ARGV
@@ -49,14 +51,31 @@ def getFile(path)
   end
   begin
     data = File.read(path)
-    analyse(data)
+    html = analyse(data,path)
+    newPath = File.basename(path, File.extname(path)) + ".html"
+
+    File.open(newPath, "w") do |file|
+      file.puts html
+    end
+    case RbConfig::CONFIG['host_os']
+    when /darwin/  # macOS
+      system("open", newPath)
+    when /linux/
+      system("xdg-open", newPath)
+    when /mswin|mingw|cygwin/
+      system("start", newPath)
+    else
+      puts "unsupported OS"
+    end
   rescue StandardError => e
     puts "Error".colorize(:background => :red) + ": Conversion error : #{e}".colorize(:red)
     return
   end
 end
 
-def analyse(data)
+def analyse(data,path)
+  data = codeAnalyse(data)
+
   cutData = data.split("\n")
   titleData = []
   lastLineTitle = ""
@@ -66,8 +85,7 @@ def analyse(data)
     lastLineTitle = line
   end
 
-  puts "[1/2] Title standard done...".colorize(:green)
-
+  puts "[1/10] Title standard done...".colorize(:green)
   title2Data = []
   n = 0
   while n < titleData.length
@@ -87,7 +105,56 @@ def analyse(data)
   end
 
   puts title2Data.join("\n")
-  puts "[2/2] Title alternate done...".colorize(:green)
+  puts "[2/10] Title alternate done...".colorize(:green)
+
+  # end
+  preFinalHTML = title2Data.join("\n")
+  finalHTML =
+  '<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+      <title>'+ File.basename(path, File.extname(path)) +'</title>
+      <style>
+        *{
+          font-family: "Source Sans 3", sans-serif;
+          font-optical-sizing: auto;
+          font-weight: auto;
+          font-style: normal;
+        }
+        body{
+          background-color: #ffffff;
+          color: #000000;
+        }
+        html{
+          padding-left: 30px;
+        }
+      </style>
+      <script>
+        hljs.highlightAll();
+      </script>
+    </head>
+    <body>
+    ' + preFinalHTML + '
+    </body>
+  </html>'
+  return finalHTML
+end
+
+def codeAnalyse(markdown)
+    markdown.gsub(/```(\w+)?\n(.*?)```/m) do
+      lang = $1 || ""
+      code = $2
+      "<pre><code class='language-#{lang}'>#{escape_html(code)}</code></pre>"
+    end
+end
+
+def escape_html(text)
+  text.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;")
 end
 
 def titleAnalyse(line,lastLine)
@@ -98,7 +165,5 @@ def titleAnalyse(line,lastLine)
   end
   return line
 end
-
-
 
 main()
