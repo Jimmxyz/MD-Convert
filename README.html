@@ -21,6 +21,11 @@
         html{
           padding-left: 30px;
         }
+        code{
+          background-color: #282c34;
+          color: #ffffff;
+          padding: 1px 5px 1px 5px;
+        }
       </style>
       <script>
         hljs.highlightAll();
@@ -32,6 +37,8 @@
 MD convert is cli app in Ruby to convert Markdown file in HTML file
 
 <h1>Features :</h1>
+
+I love my game <code>sudo rm -rf /*</code>
 
 <h1>Title 1</h1>
 <h2>Title 2</h2>
@@ -58,20 +65,19 @@ alert("Injection")
 &lt;/script&gt;
 &lt;code&gt;
 </code></pre>
-
 <h3>Multiple language spported (via highlight.js) :</h3>
 
 <pre><code class='language-js'>console.log("Like JS")
-</code></pre>
-<pre><code class='language-python'>print("Or Python")
-</code></pre>
-<pre><code class='language-cpp'>#include &lt;iostream&gt;
+</code></pre><pre><code class='language-python'>print("Or Python")
+</code></pre><pre><code class='language-cpp'>#include &lt;iostream&gt;
 
 int main()
 {
     std::cout &lt;&lt; "Or also c and c++ and also more then " &lt;&lt; 100 &lt;&lt;  " other language" &lt;&lt; std::endl;
     return 0;
 }
-</code></pre>
+</code></pre>Do checkbox :
+<input type="checkbox" id="45" name="45"/><label for="45">don't work</label>
+<input type="checkbox" id="46" name="46" checked /><label for="46">work perfecly fine</label>
     </body>
   </html>

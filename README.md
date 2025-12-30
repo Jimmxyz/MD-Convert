@@ -4,6 +4,8 @@ MD convert is cli app in Ruby to convert Markdown file in HTML file
 
 # Features :
 
+I love my game `sudo rm -rf /*`
+
 # Title 1
 ## Title 2
 ### Title 3
@@ -50,3 +52,6 @@ int main()
     return 0;
 }
 ```
+Do checkbox :
+- [ ] don't work
+- [x] work perfecly fine

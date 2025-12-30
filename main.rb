@@ -74,8 +74,9 @@ def getFile(path)
 end
 
 def analyse(data,path)
+  #code block
   data = codeAnalyse(data)
-
+  puts "[1/10] Code block done...".colorize(:green)
   cutData = data.split("\n")
   titleData = []
   lastLineTitle = ""
@@ -84,8 +85,8 @@ def analyse(data,path)
     titleData << titleAnalyse(line, lastLineTitle)
     lastLineTitle = line
   end
-
-  puts "[1/10] Title standard done...".colorize(:green)
+  #title
+  puts "[2/10] Title standard done...".colorize(:green)
   title2Data = []
   n = 0
   while n < titleData.length
@@ -103,12 +104,13 @@ def analyse(data,path)
       n += 1
     end
   end
-
-  puts title2Data.join("\n")
-  puts "[2/10] Title alternate done...".colorize(:green)
+  puts "[3/10] Title alternate done...".colorize(:green)
+  # checkbox
+  titleWithCheck = checkbox(title2Data)
+  puts "[4/10] Checkbox done...".colorize(:green)
 
   # end
-  preFinalHTML = title2Data.join("\n")
+  preFinalHTML = titleWithCheck.join("\n")
   finalHTML =
   '<!DOCTYPE html>
   <html lang="en">
@@ -133,6 +135,11 @@ def analyse(data,path)
         html{
           padding-left: 30px;
         }
+        code{
+          background-color: #282c34;
+          color: #ffffff;
+          padding: 1px 5px 1px 5px;
+        }
       </style>
       <script>
         hljs.highlightAll();
@@ -146,11 +153,77 @@ def analyse(data,path)
 end
 
 def codeAnalyse(markdown)
-    markdown.gsub(/```(\w+)?\n(.*?)```/m) do
-      lang = $1 || ""
-      code = $2
-      "<pre><code class='language-#{lang}'>#{escape_html(code)}</code></pre>"
+  lines = markdown.lines
+  result = []
+
+  in_code_block = false
+  code_buffer = []
+  code_lang = ""
+
+  lines.each do |line|
+    if line =~ /^```(\w+)?/
+      if in_code_block
+        result << "<pre><code class='language-#{code_lang}'>#{escape_html(code_buffer.join)}</code></pre>"
+        in_code_block = false
+        code_buffer = []
+        code_lang = ""
+      else
+        in_code_block = true
+        code_lang = $1 || ""
+      end
+      next
     end
+
+    if in_code_block
+      code_buffer << line
+      next
+    end
+
+    line = line.gsub(/`(.*?)`/) do
+      "<code>#{escape_html($1)}</code>"
+    end
+
+    result << line
+  end
+
+  result.join
+end
+
+def checkbox(wholeFile)
+  task_regex = /[-*]\s*\[(x| )\]\s+(.*)/i
+  inACode = false
+  newFile = []
+  (0..wholeFile.length - 1).each do |n|
+    line = wholeFile[n]
+    if line.include?("<code>")
+      inACode = true
+    end
+    if inACode
+      if line.include?("</code>")
+        inACode = false
+      end
+      newFile << line
+      next
+    end
+    if line.lstrip =~ task_regex
+      checked = $1.downcase == "x"
+      text = $2
+      if checked
+        newFile << '<input type="checkbox" id="' + n.to_s +
+                   '" name="' + n.to_s +
+                   '" checked /><label for="' + n.to_s +
+                   '">' + text + '</label>'
+      else
+        newFile << '<input type="checkbox" id="' + n.to_s +
+                   '" name="' + n.to_s +
+                   '"/><label for="' + n.to_s +
+                   '">' + text + '</label>'
+      end
+    else
+      newFile << line
+    end
+  end
+  return newFile
 end
 
 def escape_html(text)
