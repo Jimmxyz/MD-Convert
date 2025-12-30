@@ -81,6 +81,8 @@ def analyse(data,path)
   data = codeAnalyse(data)
   puts "[1/10] Code block done...".colorize(:green)
   cutData = data.split("\n")
+  cutData = quote(cutData)
+  puts "[2/10] Quote block done...".colorize(:green)
   titleData = []
   lastLineTitle = ""
 
@@ -89,7 +91,7 @@ def analyse(data,path)
     lastLineTitle = line
   end
   #title
-  puts "[2/10] Title standard done...".colorize(:green)
+  puts "[3/10] Title standard done...".colorize(:green)
   title2Data = []
   n = 0
   while n < titleData.length
@@ -107,10 +109,10 @@ def analyse(data,path)
       n += 1
     end
   end
-  puts "[3/10] Title alternate done...".colorize(:green)
+  puts "[4/10] Title alternate done...".colorize(:green)
   # checkbox
   titleWithCheck = checkbox(title2Data)
-  puts "[4/10] Checkbox done...".colorize(:green)
+  puts "[5/10] Checkbox done...".colorize(:green)
 
   # end
   puts "Finalising...".colorize(:green)
@@ -143,6 +145,11 @@ def analyse(data,path)
           background-color: #282c34;
           color: #ffffff;
           padding: 1px 5px 1px 5px;
+        }
+        blockquote{
+          border-left: 5px black solid;
+          padding-left: 10px;
+          margin-left: 0px;
         }
       </style>
       <script>
@@ -191,6 +198,44 @@ def codeAnalyse(markdown)
   end
 
   result.join
+end
+
+def quote(wholeFile)
+  task_regex = /^(>+)\s*(.+)/
+  inACode = false
+  actualDeep = 0
+  newFile = []
+  (0..wholeFile.length - 1).each do |n|
+    line = wholeFile[n]
+    if line.include?("<code>")
+      inACode = true
+    end
+    if inACode
+      if line.include?("</code>")
+        inACode = false
+      end
+      newFile << line
+      next
+    end
+    if line.lstrip =~ task_regex
+      depth = $1.length
+      text = $2
+      if depth > actualDeep
+        newFile << "<blockquote>"
+        newFile << text
+        actualDeep = depth
+      elsif depth < actualDeep
+        newFile << "</blockquote>"
+        newFile << text
+        actualDeep = depth
+      else
+        newFile << text
+      end
+    else
+      newFile << line
+    end
+  end
+  return newFile
 end
 
 def checkbox(wholeFile)
