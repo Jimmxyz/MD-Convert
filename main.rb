@@ -52,8 +52,11 @@ def getFile(path)
   begin
     data = File.read(path)
     html = analyse(data,path)
+    puts "Creating (or replacing) the html file and saving...".colorize(:green)
     newPath = File.basename(path, File.extname(path)) + ".html"
-
+    puts "Do you want to open it in the browser ? [y/n]"
+    answer = STDIN.gets.chomp
+    return unless answer.downcase.gsub(" ", "") == "y" || answer == "yes"
     File.open(newPath, "w") do |file|
       file.puts html
     end
@@ -110,6 +113,7 @@ def analyse(data,path)
   puts "[4/10] Checkbox done...".colorize(:green)
 
   # end
+  puts "Finalising...".colorize(:green)
   preFinalHTML = titleWithCheck.join("\n")
   finalHTML =
   '<!DOCTYPE html>
@@ -209,14 +213,14 @@ def checkbox(wholeFile)
       checked = $1.downcase == "x"
       text = $2
       if checked
-        newFile << '<input type="checkbox" id="' + n.to_s +
+        newFile << '<br><input type="checkbox" id="' + n.to_s +
                    '" name="' + n.to_s +
-                   '" checked /><label for="' + n.to_s +
+                   '" checked disabled/><label for="' + n.to_s +
                    '">' + text + '</label>'
       else
-        newFile << '<input type="checkbox" id="' + n.to_s +
+        newFile << '<br><input type="checkbox" id="' + n.to_s +
                    '" name="' + n.to_s +
-                   '"/><label for="' + n.to_s +
+                   '" disabled/><label for="' + n.to_s +
                    '">' + text + '</label>'
       end
     else
