@@ -231,6 +231,10 @@ def quote(wholeFile)
       else
         newFile << text
       end
+    elsif actualDeep > 0
+      actualDeep = 0
+      newFile << "</blockquote>"
+      newFile << line
     else
       newFile << line
     end
