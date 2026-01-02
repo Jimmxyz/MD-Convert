@@ -1,5 +1,6 @@
 require 'colorize'
 require 'rbconfig'
+require 'roman-numerals'
 require_relative 'emoji'
 
 def main()
@@ -72,6 +73,7 @@ def getFile(path)
     end
   rescue StandardError => e
     puts "Error".colorize(:background => :red) + ": Conversion error : #{e}".colorize(:red)
+    puts "↳ #{line}".colorize(:yellow)
     return
   end
 end
@@ -113,10 +115,11 @@ def analyse(data,path)
   # checkbox
   titleWithCheck = checkbox(title2Data)
   puts "[5/10] Checkbox done...".colorize(:green)
-
+  listOrdered = orderedList(titleWithCheck)
+  puts "[6/10] Ordered List done...".colorize(:green)
   # end
   puts "Finalising...".colorize(:green)
-  preFinalHTML = titleWithCheck.join("\n")
+  preFinalHTML = listOrdered.join("\n")
   finalHTML =
   '<!DOCTYPE html>
   <html lang="en">
@@ -242,6 +245,56 @@ def quote(wholeFile)
   return newFile
 end
 
+def orderedList(wholeFile)
+  task_regex = /^(?:(\d+)|([IVXLCDMivxlcdm]+))[\.\)]\s(.+)/
+  inACode = false
+  lastNum = -2
+  newFile = []
+  (0..wholeFile.length - 1).each do |n|
+    line = wholeFile[n]
+    if line.include?("<code>")
+      inACode = true
+    end
+    if inACode
+      if line.include?("</code>")
+        inACode = false
+      end
+      newFile << line
+      next
+    end
+    if line.lstrip =~ task_regex
+      num = $1 || $2
+      normalOpening = "<ol>"
+      if $1 == nil
+        begin
+          num = RomanNumerals.to_decimal(num)
+          normalOpening = "<ol type='I'>"
+        rescue StandardError => e
+          puts e
+          num = 0
+        end
+      end
+      text = $3
+      if lastNum == -2
+        newFile << normalOpening
+      end
+      if lastNum + 1 == num
+        newFile << "<li>" + text + "</li>"
+      else
+        newFile << "<li value='" + num.to_s + "'>" + text + "</li>"
+      end
+      lastNum = num.to_i
+    elsif lastNum != -2
+      lastNum = -2
+      newFile << "</ol>"
+      newFile << line
+    else
+      newFile << line
+    end
+  end
+  return newFile
+end
+
 def checkbox(wholeFile)
   task_regex = /[-*]\s*\[(x| )\]\s+(.*)/i
   inACode = false
@@ -291,5 +344,6 @@ def titleAnalyse(line,lastLine)
   end
   return line
 end
+
 
 main()

@@ -20,7 +20,7 @@ from [Markdown Guide](https://www.markdownguide.org/basic-syntax/#bold-and-itali
 | Blockquotes with Multiple Paragraphs | ✴️ | [Link to the section](https://www.markdownguide.org/basic-syntax/#blockquotes-with-multiple-paragraphs) |
 | Nested Blockquotes | ✅ | [Link to the section](https://www.markdownguide.org/basic-syntax/#nested-blockquotes) |
 | Blockquotes with Other Elements | ✴️ | [Link to the section](https://www.markdownguide.org/basic-syntax/#blockquotes-with-other-elements) |
-| Ordered Lists | 🟥 | [Link to the section](https://www.markdownguide.org/basic-syntax/#ordered-lists)|
+| Ordered Lists | ✅ | [Link to the section](https://www.markdownguide.org/basic-syntax/#ordered-lists)|
 | Unordered Lists | 🟥 | [Link to the section](https://www.markdownguide.org/basic-syntax/#unordered-lists)|
 | Adding Elements in Lists | 🟥 | [Link to the section](https://www.markdownguide.org/basic-syntax/#adding-elements-in-lists)|
 | Code | ✅ | [Link to the section](https://www.markdownguide.org/basic-syntax/#code)|
