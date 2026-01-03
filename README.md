@@ -21,7 +21,7 @@ from [Markdown Guide](https://www.markdownguide.org/basic-syntax/#bold-and-itali
 | Nested Blockquotes | ✅ | [Link to the section](https://www.markdownguide.org/basic-syntax/#nested-blockquotes) |
 | Blockquotes with Other Elements | ✴️ | [Link to the section](https://www.markdownguide.org/basic-syntax/#blockquotes-with-other-elements) |
 | Ordered Lists | ✅ | [Link to the section](https://www.markdownguide.org/basic-syntax/#ordered-lists)|
-| Unordered Lists | 🟥 | [Link to the section](https://www.markdownguide.org/basic-syntax/#unordered-lists)|
+| Unordered Lists | ✅ | [Link to the section](https://www.markdownguide.org/basic-syntax/#unordered-lists)|
 | Adding Elements in Lists | 🟥 | [Link to the section](https://www.markdownguide.org/basic-syntax/#adding-elements-in-lists)|
 | Code | ✅ | [Link to the section](https://www.markdownguide.org/basic-syntax/#code)|
 | Escaping Backticks | 🟥 | [Link to the section](https://www.markdownguide.org/basic-syntax/#escaping-backticks)|

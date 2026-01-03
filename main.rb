@@ -117,6 +117,8 @@ def analyse(data,path)
   puts "[5/10] Checkbox done...".colorize(:green)
   listOrdered = orderedList(titleWithCheck)
   puts "[6/10] Ordered List done...".colorize(:green)
+  listOrdered = unorderedList(listOrdered)
+  puts "[7/10] Unordered List done...".colorize(:green)
   # end
   puts "Finalising...".colorize(:green)
   preFinalHTML = listOrdered.join("\n")
@@ -287,6 +289,44 @@ def orderedList(wholeFile)
     elsif lastNum != -2
       lastNum = -2
       newFile << "</ol>"
+      newFile << line
+    else
+      newFile << line
+    end
+  end
+  return newFile
+end
+
+def unorderedList(wholeFile)
+  task_regex = /^[-+*]\s(.+)/
+  inACode = false
+  lastWasList = false
+  newFile = []
+  (0..wholeFile.length - 1).each do |n|
+    line = wholeFile[n]
+    if line.include?("<code>")
+      inACode = true
+    end
+    if inACode
+      if line.include?("</code>")
+        inACode = false
+      end
+      newFile << line
+      next
+    end
+    if line.lstrip =~ task_regex
+      text = $1
+      normalOpening = "<ul>"
+      if lastWasList == false
+        lastWasList = true
+        newFile << normalOpening
+        newFile << "<li>" + text + "</li>"
+      else
+        newFile << "<li>" + text + "</li>"
+      end
+    elsif lastWasList == true
+      lastWasList = false
+      newFile << "</ul>"
       newFile << line
     else
       newFile << line
